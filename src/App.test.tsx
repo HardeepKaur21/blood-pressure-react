@@ -13,7 +13,7 @@ describe("App component", () => {
 
     expect(screen.getByText("BPCalculator")).toBeInTheDocument();
     expect(screen.getByText("Home")).toBeInTheDocument();
-    expect(screen.getByText("Privacy")).toBeInTheDocument();
+    expect(screen.getAllByText("Privacy")).toHaveLength(2);
   });
 
   it("displays the blood pressure calculator", () => {
@@ -21,5 +21,10 @@ describe("App component", () => {
 
     expect(screen.getByText("BP Category Calculator")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Submit" })).toBeInTheDocument();
+  });
+  it("displays the footer", () => {
+    render(<App />);
+
+    expect(screen.getByText(/© 2025 - BPCalculator/)).toBeInTheDocument();
   });
 });
