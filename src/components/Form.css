@@ -16,3 +16,7 @@ hr {
   background-color: rgb(227, 226, 226);
   margin-bottom: 20px;
 }
+
+.error {
+  color: red;
+}

@@ -1,26 +1,17 @@
 import "./InputFields.css";
 
 type InputFieldsProps = {
-  systolic: string;
-  diastolic: string;
   setSystolic: React.Dispatch<React.SetStateAction<string>>;
   setDiastolic: React.Dispatch<React.SetStateAction<string>>;
 };
 
-function InputFields({
-  systolic,
-  diastolic,
-  setSystolic,
-  setDiastolic,
-}: InputFieldsProps) {
+function InputFields({ setSystolic, setDiastolic }: InputFieldsProps) {
   function saveSystolicInput(event: React.ChangeEvent<HTMLInputElement>) {
     setSystolic(event.target.value);
-    console.log(systolic);
   }
 
   function saveDiastolicInput(event: React.ChangeEvent<HTMLInputElement>) {
     setDiastolic(event.target.value);
-    console.log(diastolic);
   }
 
   return (
