@@ -15,7 +15,7 @@ function Form() {
     event.preventDefault();
     setErrorMessage(false);
 
-    if (sys >= 70 && sys <= 190 && sys > dia && dia > 40 && dia <= 100) {
+    if (sys >= 70 && sys <= 190 && sys > dia && dia >= 40 && dia <= 100) {
       setResult(calculateResult(sys, dia));
     } else {
       setErrorMessage(true);
