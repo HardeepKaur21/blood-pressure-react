@@ -34,30 +34,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">41.66% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>5/12</span>
+                <span class='fraction'>12/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">27.27% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>3/11</span>
+                <span class='fraction'>11/11</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">41.66% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>5/12</span>
+                <span class='fraction'>12/12</span>
             </div>
         
             
@@ -72,7 +72,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -119,25 +119,25 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">56x</span>
+<span class="cline-any cline-yes">56x</span>
+<span class="cline-any cline-yes">56x</span>
+<span class="cline-any cline-yes">56x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">56x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -163,16 +163,16 @@ function Form() {
   const [result, setResult] = useState("");
   const [errorMessage, setErrorMessage] = useState(false);
 &nbsp;
-  function <span class="fstat-no" title="function not covered" >handleSubmit(e</span>vent: React.SubmitEvent&lt;HTMLFormElement&gt;) {
-    const sys = <span class="cstat-no" title="statement not covered" >Number(systolic);</span>
-    const dia = <span class="cstat-no" title="statement not covered" >Number(diastolic);</span>
-<span class="cstat-no" title="statement not covered" >    event.preventDefault();</span>
-<span class="cstat-no" title="statement not covered" >    setErrorMessage(false);</span>
+  function handleSubmit(event: React.SubmitEvent&lt;HTMLFormElement&gt;) {
+    const sys = Number(systolic);
+    const dia = Number(diastolic);
+    event.preventDefault();
+    setErrorMessage(false);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (sys &gt;= 70 &amp;&amp; sys &lt;= 190 &amp;&amp; sys &gt; dia &amp;&amp; dia &gt; 40 &amp;&amp; dia &lt;= 100) {</span>
-<span class="cstat-no" title="statement not covered" >      setResult(calculateResult(sys, dia));</span>
+    if (sys &gt;= 70 &amp;&amp; sys &lt;= 190 &amp;&amp; sys &gt; dia &amp;&amp; dia &gt;= 40 &amp;&amp; dia &lt;= 100) {
+      setResult(calculateResult(sys, dia));
     } else {
-<span class="cstat-no" title="statement not covered" >      setErrorMessage(true);</span>
+      setErrorMessage(true);
     }
   }
 &nbsp;
@@ -184,7 +184,7 @@ function Form() {
         &lt;InputFields setSystolic={setSystolic} setDiastolic={setDiastolic} /&gt;
         &lt;button type="submit"&gt;Submit&lt;/button&gt;
         {!errorMessage &amp;&amp; &lt;div id="result"&gt;{result}&lt;/div&gt;}
-        {errorMessage &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >&lt;div className="error"&gt;Invalid Input&lt;/div&gt;}</span>
+        {errorMessage &amp;&amp; &lt;div className="error"&gt;Invalid Input&lt;/div&gt;}
       &lt;/form&gt;
     &lt;/&gt;
   );
@@ -198,7 +198,7 @@ export default Form;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-11-06T17:05:56.629Z
+                at 2026-11-06T22:57:55.841Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
