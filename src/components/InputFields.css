@@ -1,0 +1,33 @@
+label {
+  display: block;
+  color: #5a5a5a;
+  margin-bottom: 10px;
+}
+
+.diastolic-input {
+  margin-top: 20px;
+}
+
+input {
+  padding: 11px 13px;
+  font-size: 15px;
+  border: 1px solid rgb(205, 205, 205);
+  border-radius: 5px;
+  width: 340px;
+}
+
+button {
+  background-color: white;
+  border: 0;
+  padding: 8px 15px;
+  margin: 16px 0;
+  font-size: 16px;
+  cursor: pointer;
+  color: #5a5a5a;
+}
+
+#result {
+  font-size: 15px;
+  color: #5a5a5a;
+  margin-top: 5px;
+}
