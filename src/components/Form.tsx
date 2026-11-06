@@ -1,5 +1,6 @@
 import { useState } from "react";
 import InputFields from "./InputFields";
+import { calculateResult } from "../utils/calculateResult";
 import "./Form.css";
 
 function Form() {
@@ -14,24 +15,10 @@ function Form() {
     event.preventDefault();
     setErrorMessage(false);
 
-    if (sys >= 70 && sys <= 190 && sys > dia && dia > 40 && dia < 100) {
-      calculateResult(sys, dia);
+    if (sys >= 70 && sys <= 190 && sys > dia && dia > 40 && dia <= 100) {
+      setResult(calculateResult(sys, dia));
     } else {
       setErrorMessage(true);
-    }
-  }
-
-  function calculateResult(sys: number, dia: number) {
-    if (sys >= 140 || dia >= 90) {
-      setResult("High Blood Pressure");
-    } else {
-      if (dia < 60 && sys < 90) {
-        setResult("Low Blood Pressure");
-      } else if ((dia < 80 && dia >= 60) || (sys >= 90 && sys < 120)) {
-        setResult("Ideal Blood Pressure");
-      } else if ((dia < 90 && dia >= 80) || (sys >= 120 && sys < 140)) {
-        setResult("Pre-High Blood Pressure");
-      }
     }
   }
 
