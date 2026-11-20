@@ -34,6 +34,31 @@ jobs:
       - run: npm run lint
       - run: npm run build
 
+  deploy-qa:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/qa'
+    runs-on: ubuntu-latest
+    environment: qa
+
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24.x
+
+      - run: npm install --global vercel@65.17.0
+      - run: vercel pull --yes --environment=preview --git-branch=qa
+      - run: vercel build
+      - run: vercel deploy --prebuilt
+
   deploy-vercel:
     needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
