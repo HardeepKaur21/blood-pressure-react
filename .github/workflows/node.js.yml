@@ -5,7 +5,7 @@ name: CI pipeline
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "qa"]
   pull_request:
     branches: ["main"]
 
@@ -33,6 +33,57 @@ jobs:
       - run: npx vitest run --coverage
       - run: npm run lint
       - run: npm run build
+
+  deploy-qa:
+    outputs:
+      url: ${{ steps.deploy.outputs.url }}
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/qa'
+    runs-on: ubuntu-latest
+    environment: qa
+
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24.x
+
+      - run: npm install --global vercel@65.17.0
+      - run: vercel pull --yes --environment=preview --git-branch=qa
+      - run: vercel build
+      - name: Deploy to Vercel QA
+        id: deploy
+        run: |
+          URL=$(vercel deploy --prebuilt)
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+
+  e2e-tests:
+    needs: deploy-qa
+    runs-on: ubuntu-latest
+
+    env:
+      PLAYWRIGHT_BASE_URL: ${{ needs.deploy-qa.outputs.url }}
+      VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24.x
+          cache: "npm"
+
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test
 
   deploy-vercel:
     needs: build
