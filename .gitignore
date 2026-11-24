@@ -25,3 +25,10 @@ dist-ssr
 
 #Coverage reports
 coverage/
+.vercel
+.env*
+.env
+
+
+playwright-report/
+test-results/
