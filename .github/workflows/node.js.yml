@@ -85,6 +85,36 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npx playwright test
 
+  performance-tests:
+    needs: [deploy-qa, e2e-tests]
+    runs-on: ubuntu-latest
+
+    env:
+      K6_BASE_URL: ${{ needs.deploy-qa.outputs.url }}
+      VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install k6
+        uses: grafana/setup-k6-action@v1
+
+      - name: Run k6 baseline test
+        run: k6 run --summary-export=baseline-results.json performance/baseline.js
+
+      - name: Run k6 load test
+        run: k6 run --summary-export=load-results.json performance/load.js
+
+      - name: Upload performance results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-performance-results
+          path: |
+            baseline-results.json
+            load-results.json
+          if-no-files-found: warn
+
   deploy-vercel:
     needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
