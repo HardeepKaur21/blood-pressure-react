@@ -1,7 +1,9 @@
-import { next } from "@vercel/functions";
+import { next, rewrite } from "@vercel/functions";
+
+const stableURL = "https://blood-pressure-react.vercel.app";
 
 export const config = {
-  matcher: ["/"],
+  matcher: ["/", "/assets/:path*", "/favicon.svg"],
 };
 
 export default function middleware(request: Request) {
@@ -21,14 +23,26 @@ export default function middleware(request: Request) {
     group = Math.random() < 0.1 ? "canary" : "stable";
   }
 
-  const response = next();
+  let response: Response;
+
+  if (group === "stable") {
+    const destination = new URL(request.url);
+    destination.hostname = new URL(stableURL).hostname;
+
+    response = rewrite(destination);
+  } else {
+    response = next();
+  }
 
   response.headers.set("x-canary-group", group);
 
-  response.headers.append(
-    "Set-Cookie",
-    `canary_group=${group}; Path=/; Max-Age=3600; SameSite=Lax; Secure`,
-  );
+  if (new URL(request.url).pathname === "/") {
+    response.headers.append(
+      "Set-Cookie",
+      `canary_group=${group}; Path=/; Max-Age=3600; SameSite=Lax; Secure`,
+    );
+    response.headers.set("Cache-Control", "private, no-store");
+  }
 
   return response;
 }
