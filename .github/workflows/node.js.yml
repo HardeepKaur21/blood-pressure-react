@@ -139,3 +139,26 @@ jobs:
       - run: vercel pull --yes --environment=production
       - run: vercel build --prod
       - run: vercel deploy --prebuilt --prod
+
+  security-tests:
+    needs: deploy-qa
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    env:
+      ZAP_AUTH_HEADER: x-vercel-protection-bypass
+      ZAP_AUTH_HEADER_VALUE: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+      ZAP_AUTH_HEADER_SITE: ${{ needs.deploy-qa.outputs.url }}
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: OWASP ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.15.0
+        with:
+          target: ${{ needs.deploy-qa.outputs.url }}
+          allow_issue_writing: false
+          fail_action: false
+          artifact_name: zap-security-report
