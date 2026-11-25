@@ -1,6 +1,7 @@
 import { next, rewrite } from "@vercel/functions";
 
-const stableURL = "https://blood-pressure-react.vercel.app";
+const stableURL =
+  "https://blood-pressure-react-b16r8tec4-h-and-s-studio.vercel.app";
 
 export const config = {
   matcher: ["/", "/assets/:path*", "/favicon.svg"],
