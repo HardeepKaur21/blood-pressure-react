@@ -1,0 +1,11 @@
+Stable:
+https://blood-pressure-react.vercel.app
+
+Canary:
+https://blood-pressure-react-h4khfo26x-h-and-s-studio.vercel.app
+
+Traffic split:
+90% stable / 10% canary
+
+Sticky assignment:
+canary_group cookie
