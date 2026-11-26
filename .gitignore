@@ -34,3 +34,11 @@ playwright-report/
 test-results/
 .vercel
 .env*
+
+
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+crash.log
