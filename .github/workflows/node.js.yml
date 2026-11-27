@@ -98,6 +98,7 @@ jobs:
       VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
       K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
       K6_CLOUD_STACK_ID: ${{ vars.K6_CLOUD_STACK_ID }}
+      K6_CLOUD_PROJECT_ID: ${{ vars.K6_CLOUD_PROJECT_ID }}
 
     steps:
       - uses: actions/checkout@v7
