@@ -124,6 +124,15 @@ jobs:
             -e VERCEL_AUTOMATION_BYPASS_SECRET="$VERCEL_AUTOMATION_BYPASS_SECRET" \
             performance/load.js
 
+      - name: Run k6 spike test
+        env:
+          K6_SUMMARY_EXPORT: spike-results.json
+        run: |
+          k6 cloud run --local-execution --no-archive-upload \
+            -e K6_BASE_URL="$K6_BASE_URL" \
+            -e VERCEL_AUTOMATION_BYPASS_SECRET="$VERCEL_AUTOMATION_BYPASS_SECRET" \
+            performance/spike.js
+
       - name: Upload performance results
         if: always()
         uses: actions/upload-artifact@v4
@@ -132,6 +141,7 @@ jobs:
           path: |
             baseline-results.json
             load-results.json
+            spike-results.json
           if-no-files-found: warn
 
   #automated secutiry checks
