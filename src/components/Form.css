@@ -20,3 +20,13 @@ hr {
 .error {
   color: red;
 }
+
+/* The new stuff for canary */
+button[type="submit"] {
+  background-color: #747678;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
