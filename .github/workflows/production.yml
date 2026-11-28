@@ -1,0 +1,123 @@
+name: Production Deployment and Rollback
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-release
+  cancel-in-progress: false
+
+jobs:
+  deploy-production:
+    if: github.ref == 'refs/heads/main' && vars.ENABLE_PRODUCTION_RELEASE == 'true'
+
+    runs-on: ubuntu-latest
+    environment: production
+
+    outputs:
+      url: ${{ steps.deploy.outputs.url }}
+
+    env:
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@65.17.0
+
+      - name: Pull production configuration
+        run: vercel pull --yes --environment=production
+
+      - name: Build production application
+        run: vercel build --prod
+
+      - name: Stage production deployment
+        id: deploy
+        run: |
+          set -euo pipefail
+          URL=$(vercel deploy --prebuilt --prod --skip-domain)
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "Staged production deployment: $URL"
+
+      - name: Install application dependencies
+        run: npm ci
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Smoke test staged deployment
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ steps.deploy.outputs.url }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        run: npx playwright test e2e/production-smoke.pw.ts
+
+      - name: Promote to production
+        id: promote
+        env:
+          DEPLOYMENT_URL: ${{ steps.deploy.outputs.url }}
+        run: |
+          vercel promote "$DEPLOYMENT_URL" --yes
+
+      - name: Verify live production
+        id: production_smoke
+        continue-on-error: true
+        env:
+          PLAYWRIGHT_BASE_URL: https://blood-pressure-react.vercel.app
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        run: npx playwright test e2e/production-smoke.pw.ts --retries=1
+
+      - name: Confirm production failure
+        id: confirm_failure
+        if: steps.production_smoke.outcome == 'failure'
+        continue-on-error: true
+        env:
+          PLAYWRIGHT_BASE_URL: https://blood-pressure-react.vercel.app
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        run: npx playwright test e2e/production-smoke.pw.ts --retries=1
+
+      - name: Automatic rollback
+        id: rollback
+        if: steps.production_smoke.outcome == 'failure' && steps.confirm_failure.outcome == 'failure'
+        run: |
+          echo "Production verification failed twice."
+          echo "Restoring the previous production deployment."
+          vercel rollback
+
+      - name: Verify rollback recovery
+        if: steps.rollback.outcome == 'success'
+        env:
+          PLAYWRIGHT_BASE_URL: https://blood-pressure-react.vercel.app
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        run: npx playwright test e2e/production-smoke.pw.ts --retries=2
+
+      - name: Report production release result
+        if: ${{ always() && steps.promote.outcome == 'success' }}
+        env:
+          FIRST_CHECK: ${{ steps.production_smoke.outcome }}
+          SECOND_CHECK: ${{ steps.confirm_failure.outcome }}
+          ROLLBACK_RESULT: ${{ steps.rollback.outcome }}
+        run: |
+          if [ "$FIRST_CHECK" = "success" ]; then
+            echo "Production verification passed."
+          elif [ "$SECOND_CHECK" = "success" ]; then
+            echo "::warning::Initial production check failed, but confirmation passed."
+          elif [ "$ROLLBACK_RESULT" = "success" ]; then
+            echo "::error::Production release failed. Rollback was executed."
+            exit 1
+          else
+            echo "::error::Production checks failed and recovery was not confirmed."
+            exit 1
+          fi
